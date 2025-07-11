@@ -680,7 +680,11 @@ first_person_shooter.update_players = function(deltaTime)
   for player_name, player_metadata in pairs(first_person_shooter.players_metadata) do
     local weapon_metadata = player_metadata:get_weapon_metadata()
     if not weapon_metadata then
-      player_metadata.player:hud_remove(player_metadata.weapon_hud_element)
+      if player_metadata.weapon_hud_element then
+  player_metadata.player:hud_remove(player_metadata.weapon_hud_element)
+  player_metadata.weapon_hud_element = nil
+end
+
       player_metadata.player:hud_set_flags({
         hotbar = true,
         healthbar = true,
@@ -735,20 +739,29 @@ first_person_shooter.update_players = function(deltaTime)
     local movement_x_offset = (math.sin(player_metadata.life_time * average_speed * 1.5) * 0.012) * player_metadata.movement_amount
     local movement_y_offset = (math.sin(player_metadata.life_time * average_speed * 3) * 0.013) * player_metadata.movement_amount
 
-    local animation_data = first_person_shooter.get_player_weapon_animation_data(player_metadata, weapon_metadata)
-    player_metadata.player:hud_remove(player_metadata.weapon_hud_element)
-    player_metadata.weapon_hud_element = player_metadata.player:hud_add({
-      hud_elem_type = "image",
-      text = animation_data.weapon_state_animation.texture_prefix .. "." .. animation_data.frame_number .. ".png",
-      position = {
-        x = 0.5,
-        y = 0.5,
-      },
-      scale = { x = -100, y = -100 },
-      alignment = { x = 0, y = 0 },
-      offset = { x = 0, y = 0 },
-      size = { x = 16, y = 9 },
-    })
+local animation_data = first_person_shooter.get_player_weapon_animation_data(player_metadata, weapon_metadata)
+
+	if player_metadata.weapon_hud_element then
+	  if player_metadata.weapon_hud_element then
+  player_metadata.player:hud_remove(player_metadata.weapon_hud_element)
+  player_metadata.weapon_hud_element = nil
+end
+
+	end
+
+	player_metadata.weapon_hud_element = player_metadata.player:hud_add({
+	  hud_elem_type = "image",
+	  text = animation_data.weapon_state_animation.texture_prefix .. "." .. animation_data.frame_number .. ".png",
+	  position = {
+	    x = 0.5,
+	    y = 0.5,
+	  },
+	  scale = { x = -100, y = -100 },
+	  alignment = { x = 0, y = 0 },
+	  offset = { x = 0, y = 0 },
+	  size = { x = 16, y = 9 },
+	})
+
 
     local animation_duration = (animation_data.weapon_state_animation.total_frames - 1) / weapon_metadata.animation_framerate
     if player_metadata.weapon_state_time >= animation_duration then
